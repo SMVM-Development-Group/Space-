@@ -1,0 +1,13 @@
+# Track only the application source tree. Everything else at the repository
+# root (build outputs, installer artifacts, tests and local solution files) is
+# intentionally local.
+/*
+!/.gitignore
+
+# Generated artifacts inside the source tree are not source code.
+/src/**/bin/
+/src/**/obj/
+build/portable/SpacePlusPlus.exe
+/build/portable
+*.exe
+/build/portable
