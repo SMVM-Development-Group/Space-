@@ -1,0 +1,163 @@
+<UserControl x:Class="SpacePlusPlus.Views.StorageMapPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:SpacePlusPlus.Controls">
+
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Storage Map" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text=" — rectangle area shows disk usage; click folders to navigate."
+                           Style="{StaticResource SubText}" VerticalAlignment="Center" Margin="4,3,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Scan" Style="{StaticResource BtnSmall}" Command="{Binding ScanNowCommand}" MinWidth="86"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Breadcrumbs + details -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="12,9" Margin="0,16,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Style="{StaticResource BtnIcon}" Command="{Binding NavigateUpCommand}"
+                        ToolTip="Go to parent folder" IsEnabled="{Binding CanNavigateUp}">
+                    <Path Data="{StaticResource IconBack}" Style="{StaticResource IconPath}" Width="14" Height="14"/>
+                </Button>
+
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Breadcrumbs}" Margin="8,0,8,0"
+                              VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{Binding Name}" Style="{StaticResource BtnGhost}" Padding="4,2"
+                                        FontSize="12" Command="{Binding NavigateCommand}"
+                                        Foreground="{DynamicResource TextSecondary}"/>
+                                <Path Data="{StaticResource IconChevronRight}" Style="{StaticResource IconPath}"
+                                      Width="10" Height="10" Stroke="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding CurrentSizeText}" Style="{StaticResource MonoText}" VerticalAlignment="Center"/>
+                    <TextBlock Text=" · " Style="{StaticResource MonoText}"/>
+                    <TextBlock Text="{Binding CurrentFilesText}" Style="{StaticResource MonoText}" VerticalAlignment="Center"/>
+                    <TextBlock Text=" files · " Style="{StaticResource MonoText}"/>
+                    <TextBlock Text="{Binding CurrentDirsText}" Style="{StaticResource MonoText}" VerticalAlignment="Center"/>
+                    <TextBlock Text=" folders" Style="{StaticResource MonoText}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Map -->
+        <Border Grid.Row="2" Background="{DynamicResource Bg2}" BorderBrush="{DynamicResource ControlBorder}"
+                BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+            <Grid>
+                <controls:TreemapControl x:Name="Treemap" ItemsSource="{Binding Items}" RootSize="{Binding RootSize}"
+                                         Margin="6"/>
+                <Border Background="{DynamicResource Bg2}" Padding="16,14"
+                        Visibility="{Binding HasItems, Converter={StaticResource BoolToVisInverted}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="420">
+                        <Path Data="{StaticResource IconStorageMap}" Style="{StaticResource IconPath}"
+                              Width="30" Height="30" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                        <TextBlock Text="No map data" Style="{StaticResource AppText}" FontWeight="SemiBold"/>
+                        <TextBlock Style="{StaticResource SubText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                   Text="Run a scan first — the treemap shows the scanned location's folders and the largest files inside them."/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Toolbar + top items -->
+        <Grid Grid.Row="3" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="330"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource Card}" Padding="14,10" VerticalAlignment="Top">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="190"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                                 Tag="Filter names in the current view…"
+                                 VerticalContentAlignment="Center"/>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Smallest displayed item" Style="{StaticResource MutedText}" Margin="0,0,0,4"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Slider Value="{Binding MinItemRatioPercent}" Minimum="0.05" Maximum="2"
+                                        TickFrequency="0.05" IsSnapToTickEnabled="True"/>
+                                <TextBlock Grid.Column="1" Text="{Binding MinItemRatioText}" Style="{StaticResource MutedText}"
+                                           Margin="8,0,0,0" VerticalAlignment="Center" MinWidth="80" TextAlignment="Right"/>
+                            </Grid>
+                        </StackPanel>
+                        <ComboBox Grid.Column="4" ItemsSource="{Binding SortModes}" SelectedItem="{Binding SortMode}"
+                                  VerticalContentAlignment="Center" ToolTip="Sort order of the list"/>
+                    </Grid>
+                    <TextBlock Text="{Binding ViewModeNote}" Style="{StaticResource MutedText}" Margin="0,8,0,0"
+                               Visibility="{Binding ViewModeNote, Converter={StaticResource NullToVis}}"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}" Padding="14,10">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Largest items here" Style="{StaticResource SectionTitle}"
+                               Margin="0,0,0,8"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="190">
+                        <ItemsControl ItemsSource="{Binding TopItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Path Data="{StaticResource IconFolder}" Style="{StaticResource IconPath}"
+                                                  Width="13" Height="13"
+                                                  Visibility="{Binding IsDirectory, Converter={StaticResource BoolToVis}}"/>
+                                            <Path Data="{StaticResource IconFile}" Style="{StaticResource IconPath}"
+                                                  Width="13" Height="13"
+                                                  Visibility="{Binding IsDirectory, Converter={StaticResource BoolToVisInverted}}"/>
+                                            <TextBlock Text="{Binding Name}" Style="{StaticResource SubText}" Margin="8,0,0,0"
+                                                       TextTrimming="CharacterEllipsis" MaxWidth="180" VerticalAlignment="Center"
+                                                       ToolTip="{Binding Path}"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding SizeText}" Style="{StaticResource MonoText}"
+                                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

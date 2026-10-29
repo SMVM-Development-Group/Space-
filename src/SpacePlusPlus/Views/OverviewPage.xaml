@@ -1,0 +1,252 @@
+<UserControl x:Class="SpacePlusPlus.Views.OverviewPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:SpacePlusPlus.Controls">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,22,28,24">
+        <StackPanel MaxWidth="1080" HorizontalAlignment="Left">
+
+            <TextBlock Text="Overview" Style="{StaticResource PageTitle}"/>
+            <TextBlock Text="Drives, storage breakdown and cleanup opportunities at a glance."
+                       Style="{StaticResource SubText}" Margin="0,3,0,18"/>
+
+            <!-- ============ Scan control ============ -->
+            <Border Style="{StaticResource Card}" Padding="18,14">
+                <StackPanel>
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Content="Start scan" Style="{StaticResource BtnPrimary}" MinWidth="110"
+                                    Command="{Binding StartScanCommand}"
+                                    Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisInverted}}"/>
+                            <Button Content="Rescan" Style="{StaticResource ButtonBaseStyle}" MinWidth="100"
+                                    Command="{Binding RescanCommand}" Margin="10,0,0,0"
+                                    Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisInverted}}"/>
+                            <Button Style="{StaticResource BtnIcon}" Command="{Binding TogglePauseCommand}"
+                                    ToolTip="Pause or resume the scan"
+                                    Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+                                <Grid>
+                                    <Path Data="{StaticResource IconPause}" Style="{StaticResource IconPath}"
+                                          Visibility="{Binding IsPaused, Converter={StaticResource BoolToVisInverted}}"/>
+                                    <Path Data="{StaticResource IconPlay}" Style="{StaticResource IconPath}"
+                                          Visibility="{Binding IsPaused, Converter={StaticResource BoolToVis}}"/>
+                                </Grid>
+                            </Button>
+                            <Button Content="Cancel" Style="{StaticResource BtnDanger}" MinWidth="90"
+                                    Command="{Binding CancelScanCommand}" Margin="6,0,0,0"
+                                    Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button Content="Refresh drives" Style="{StaticResource BtnSmall}" Command="{Binding RefreshDrivesCommand}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Scan progress -->
+                    <StackPanel Margin="0,14,0,0" Visibility="{Binding IsScanning, Converter={StaticResource BoolToVis}}">
+                        <ProgressBar Value="50" IsIndeterminate="True"/>
+                        <Grid Margin="0,8,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding FilesText}" Style="{StaticResource MonoText}"/>
+                                <TextBlock Text=" files · " Style="{StaticResource MonoText}"/>
+                                <TextBlock Text="{Binding DirsText}" Style="{StaticResource MonoText}"/>
+                                <TextBlock Text=" folders · " Style="{StaticResource MonoText}"/>
+                                <TextBlock Text="{Binding BytesText}" Style="{StaticResource MonoText}"/>
+                                <TextBlock Text=" · elapsed " Style="{StaticResource MonoText}"/>
+                                <TextBlock Text="{Binding ElapsedText}" Style="{StaticResource MonoText}"/>
+                                <TextBlock Text="{Binding ErrorsText}" Style="{StaticResource MutedText}" Margin="10,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding CurrentDirectoryText}" Style="{StaticResource MutedText}"
+                                       HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" MaxWidth="560"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding ScanErrorText}" Style="{StaticResource SubText}" Foreground="{DynamicResource Warning}"
+                               TextWrapping="Wrap" Margin="0,10,0,0"
+                               Visibility="{Binding ScanErrorText, Converter={StaticResource NullToVis}}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============ Drives ============ -->
+            <TextBlock Text="Drives" Style="{StaticResource SectionTitle}" Margin="0,22,0,10"/>
+            <ItemsControl ItemsSource="{Binding DriveCards}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource Card}" Width="230" Margin="0,0,12,0" Padding="14,12"
+                                Background="{DynamicResource Bg3}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconDrive}" Style="{StaticResource IconPath}" Width="16" Height="16"/>
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource AppText}"
+                                                   FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" MaxWidth="170"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding FileSystem}" Style="{StaticResource MutedText}"
+                                               HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Grid Margin="0,10,0,4">
+                                    <ProgressBar Value="{Binding UsedPercentValue, Mode=OneWay}" Maximum="100"/>
+                                </Grid>
+                                <Grid Margin="0,4,0,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding UsedText}" Style="{StaticResource SubText}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding UsedPercent}" Style="{StaticResource MutedText}" Margin="6,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding FreeText}" Style="{StaticResource MutedText}"
+                                               HorizontalAlignment="Right"
+                                               ToolTip="{Binding TotalText, StringFormat=Total: {0}}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- ============ Empty state ============ -->
+            <Border Style="{StaticResource Card}" Padding="22,26" Margin="0,22,0,0"
+                    Visibility="{Binding HasScan, Converter={StaticResource BoolToVisInverted}}">
+                <StackPanel>
+                    <Path Data="{StaticResource IconGauge}" Style="{StaticResource IconPath}" Width="30" Height="30"
+                          HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource AppText}" FontWeight="SemiBold" Text="No scan results yet"/>
+                    <TextBlock Style="{StaticResource SubText}" Margin="0,4,0,12" TextWrapping="Wrap"
+                               Text="Run a scan to analyze storage usage. The first fixed drive is used by default; set a different location in Settings."/>
+                    <Button Content="Start scan" Style="{StaticResource BtnPrimary}" MinWidth="120"
+                            HorizontalAlignment="Left" Command="{Binding StartScanCommand}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- ============ Categories + recommendations ============ -->
+            <Grid Margin="0,22,0,0" Visibility="{Binding HasScan, Converter={StaticResource BoolToVis}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="400"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="380"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Categories -->
+                <Border Style="{StaticResource Card}" Grid.Column="0">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="Storage categories" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="{Binding CategoryTotal, Converter={StaticResource BytesToSize}}"
+                                       Style="{StaticResource MonoText}" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                        <controls:CategoryStrip Height="12" Segments="{Binding CategorySegments}" Margin="0,0,0,12"/>
+                        <ItemsControl ItemsSource="{Binding CategoryStats}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="10" Height="10" CornerRadius="3"
+                                                    Background="{Binding ColorBrush}" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SubText}"
+                                                       Margin="9,0,0,0" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding SizeText}" Style="{StaticResource MonoText}"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding ShareText}" Style="{StaticResource MutedText}"
+                                                       Margin="10,0,0,0" Width="46" TextAlignment="Right"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0"
+                                    Visibility="{Binding UnclassifiedText, Converter={StaticResource NullToVis}}">
+                            <Path Data="{StaticResource IconInfo}" Style="{StaticResource IconPath}" Width="13" Height="13"/>
+                            <TextBlock Style="{StaticResource MutedText}" Margin="7,0,0,0" TextWrapping="Wrap" MaxWidth="330">
+                                <Run Text="Drive usage not attributed to any scanned file:"/>
+                                <Run Text="{Binding UnclassifiedText, Mode=OneWay}" FontWeight="SemiBold"/>
+                                <Run Text=" — protected or unreadable areas, metadata and compression effects."/>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recommendations -->
+                <Border Style="{StaticResource Card}" Grid.Column="2" Padding="16,14">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="Cleanup recommendations" Style="{StaticResource SectionTitle}"/>
+                        </Grid>
+                        <Grid Margin="0,0,0,10">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding CleanupEstimateText}" Style="{StaticResource StatValue}"
+                                           Foreground="{DynamicResource TextPrimary}"/>
+                                <TextBlock Text=" estimated" Style="{StaticResource SubText}"
+                                           VerticalAlignment="Bottom" Margin="6,0,0,5"/>
+                            </StackPanel>
+                            <TextBlock Text="recoverable" Style="{StaticResource MutedText}" HorizontalAlignment="Right"
+                                       VerticalAlignment="Bottom" Margin="0,0,0,6"/>
+                        </Grid>
+                        <Separator Style="{StaticResource HSeparator}" Margin="0,0,0,10"/>
+                        <ItemsControl ItemsSource="{Binding Recommendations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <StackPanel Orientation="Horizontal" MaxWidth="330">
+                                            <TextBlock Text="{Binding Title}" Style="{StaticResource SubText}"
+                                                       TextTrimming="CharacterEllipsis" MaxWidth="200"
+                                                       VerticalAlignment="Center" ToolTip="{Binding Title}"/>
+                                            <Border Style="{StaticResource ChipNeutral}" Margin="8,0,0,0">
+                                                <TextBlock Text="{Binding CategoryText}" Style="{StaticResource ChipText}"
+                                                           Foreground="{DynamicResource TextMuted}"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="{Binding SizeText}" Style="{StaticResource MonoText}"
+                                                       VerticalAlignment="Center"/>
+                                            <Border Style="{StaticResource ChipSafe}" Margin="8,0,0,0"
+                                                    Visibility="{Binding IsSafe, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding Confidence}" Style="{StaticResource ChipText}"
+                                                           Foreground="{DynamicResource Success}"/>
+                                            </Border>
+                                            <Border Style="{StaticResource ChipCaution}" Margin="8,0,0,0"
+                                                    Visibility="{Binding IsSafe, Converter={StaticResource BoolToVisInverted}}">
+                                                <TextBlock Text="{Binding Confidence}" Style="{StaticResource ChipText}"
+                                                           Foreground="{DynamicResource Warning}"/>
+                                            </Border>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Content="Review in Smart Cleanup" Style="{StaticResource ButtonBaseStyle}" MinWidth="180"
+                                HorizontalAlignment="Left" Margin="0,14,0,0" Command="{Binding ReviewCleanupCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- ============ Recent activity ============ -->
+            <TextBlock Text="Recent activity" Style="{StaticResource SectionTitle}" Margin="0,22,0,10"
+                       Visibility="{Binding HasActivity, Converter={StaticResource BoolToVis}}"/>
+            <ItemsControl ItemsSource="{Binding RecentActivity}"
+                          Visibility="{Binding HasActivity, Converter={StaticResource BoolToVis}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,3">
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="4" Height="4" CornerRadius="2" Background="{DynamicResource Accent}"
+                                        VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Title}" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}" Margin="10,0,0,0"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="560"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding TimeText}" Style="{StaticResource MutedText}" HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

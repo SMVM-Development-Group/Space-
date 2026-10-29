@@ -1,0 +1,38 @@
+<dialogs:SpaceDialogWindow x:Class="SpacePlusPlus.Views.Dialogs.ConfirmDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dialogs="clr-namespace:SpacePlusPlus.Views.Dialogs"
+        Title="Confirm">
+    <StackPanel>
+        <Grid Height="40" Background="{DynamicResource Bg1}">
+            <TextBlock Text="{Binding TitleText}" Margin="14,0,0,0" VerticalAlignment="Center"
+                       FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+            <Button Style="{StaticResource WindowButton}" Width="38" Height="28" HorizontalAlignment="Right"
+                    Margin="0,0,8,0" IsCancel="True">
+                <Path Data="{StaticResource IconClose}" Style="{StaticResource IconPath}" Width="12" Height="12"/>
+            </Button>
+        </Grid>
+        <StackPanel Margin="18,16,18,16">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Path x:Name="Icon" Width="22" Height="22" VerticalAlignment="Top" Margin="0,1,12,0"/>
+                <TextBlock Text="{Binding MessageText}" Style="{StaticResource AppText}" TextWrapping="Wrap"
+                           MaxWidth="430" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <Border Background="{DynamicResource Bg2}" BorderBrush="{DynamicResource ControlBorder}"
+                    BorderThickness="1" CornerRadius="7" Padding="10,8" MaxHeight="180"
+                    Visibility="{Binding DetailsText, Converter={StaticResource NullToVis}}" Margin="34,0,0,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding DetailsText}" Style="{StaticResource MonoText}" TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </Border>
+            <CheckBox IsChecked="{Binding CheckboxResult}" Content="{Binding CheckboxText}" Margin="34,14,0,0"
+                      VerticalAlignment="Center"
+                      Visibility="{Binding CheckboxText, Converter={StaticResource NullToVis}}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <Button Content="Cancel" Style="{StaticResource BtnSecondary}" IsCancel="True" MinWidth="90" Margin="0,0,10,0"/>
+                <Button x:Name="ConfirmButton" Content="{Binding ConfirmText}" Style="{StaticResource BtnPrimary}"
+                        MinWidth="110" IsDefault="True" Click="Confirm_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</dialogs:SpaceDialogWindow>

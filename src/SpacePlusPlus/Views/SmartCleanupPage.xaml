@@ -1,0 +1,177 @@
+<UserControl x:Class="SpacePlusPlus.Views.SmartCleanupPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="CleanupGroupTemplate">
+            <Border Style="{StaticResource Card}" Padding="14,12" Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                              VerticalAlignment="Top" Margin="0,2,12,0"/>
+
+                    <StackPanel Grid.Column="1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Title}" Style="{StaticResource AppText}" FontWeight="SemiBold"
+                                       VerticalAlignment="Center"/>
+                            <Border Style="{StaticResource ChipSafe}" Margin="10,0,0,0"
+                                    Visibility="{Binding IsSafe, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="{Binding SafetyText}" Style="{StaticResource ChipText}"
+                                           Foreground="{DynamicResource Success}"/>
+                            </Border>
+                            <Border Style="{StaticResource ChipCaution}" Margin="10,0,0,0"
+                                    Visibility="{Binding IsSafe, Converter={StaticResource BoolToVisInverted}}">
+                                <TextBlock Text="{Binding SafetyText}" Style="{StaticResource ChipText}"
+                                           Foreground="{DynamicResource Warning}"/>
+                            </Border>
+                            <Border Style="{StaticResource ChipNeutral}" Margin="8,0,0,0">
+                                <TextBlock Text="{Binding CategoryLabel}" Style="{StaticResource ChipText}"
+                                           Foreground="{DynamicResource TextMuted}"/>
+                            </Border>
+                            <Border Style="{StaticResource ChipDanger}" Margin="8,0,0,0"
+                                    Visibility="{Binding RequiresAdmin, Converter={StaticResource BoolToVis}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path Data="{StaticResource IconShield}" Style="{StaticResource IconPath}"
+                                          Width="10" Height="10" Stroke="{DynamicResource Error}"/>
+                                    <TextBlock Text="Administrator" Style="{StaticResource ChipText}" Margin="5,0,0,0"
+                                               Foreground="{DynamicResource Error}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Description}" Style="{StaticResource SubText}" Margin="0,4,0,0"
+                                   TextWrapping="Wrap" MaxWidth="620" HorizontalAlignment="Left"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                    Visibility="{Binding Warning, Converter={StaticResource NullToVis}}">
+                            <Path Data="{StaticResource IconWarning}" Style="{StaticResource IconPath}"
+                                  Width="13" Height="13" Stroke="{DynamicResource Warning}" VerticalAlignment="Top"/>
+                            <TextBlock Text="{Binding Warning}" Style="{StaticResource SubText}" Margin="7,0,0,0"
+                                       Foreground="{DynamicResource Warning}" TextWrapping="Wrap" MaxWidth="600"
+                                       HorizontalAlignment="Left"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                    Visibility="{Binding HasExtraNote, Converter={StaticResource BoolToVis}}">
+                            <Path Data="{StaticResource IconInfo}" Style="{StaticResource IconPath}"
+                                  Width="13" Height="13" VerticalAlignment="Top"/>
+                            <TextBlock Text="{Binding ExtraNote}" Style="{StaticResource MutedText}" Margin="7,0,0,0"
+                                       TextWrapping="Wrap" MaxWidth="600" HorizontalAlignment="Left"/>
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding SamplePaths[0]}" Style="{StaticResource MutedText}"
+                                   Margin="0,5,0,0" TextTrimming="CharacterEllipsis" MaxWidth="600"
+                                   ToolTip="Example detected item"
+                                   Visibility="{Binding HasSamples, Converter={StaticResource BoolToVis}}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0"
+                                    Visibility="{Binding LockedReason, Converter={StaticResource NullToVis}}">
+                            <Path Data="{StaticResource IconCancel}" Style="{StaticResource IconPath}"
+                                  Width="13" Height="13" Stroke="{DynamicResource Error}" VerticalAlignment="Top"/>
+                            <TextBlock Text="{Binding LockedReason}" Style="{StaticResource SubText}" Margin="7,0,0,0"
+                                       Foreground="{DynamicResource Error}" TextWrapping="Wrap" MaxWidth="600"
+                                       HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding SizeText}" Style="{StaticResource AppText}" FontWeight="SemiBold"
+                                   HorizontalAlignment="Right"/>
+                        <TextBlock Text="{Binding FilesText}" Style="{StaticResource MutedText}" Margin="0,2,0,0"
+                                   HorizontalAlignment="Right"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Smart Cleanup" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="{Binding DetectedAtText}" Style="{StaticResource SubText}" Margin="12,3,0,0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Analyze component store" Style="{StaticResource BtnSmall}"
+                        Command="{Binding AnalyzeComponentStoreCommand}" Margin="0,0,10,0"
+                        ToolTip="Runs DISM (elevated) to estimate Windows Update component store cleanup."/>
+                <Button Content="Re-detect" Style="{StaticResource BtnSmall}" Command="{Binding DetectCommand}"
+                        IsEnabled="{Binding IsDetecting, Converter={StaticResource BoolToVisInverted}}" MinWidth="96"/>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Margin="0,14,0,10"
+                    Visibility="{Binding IsDetecting, Converter={StaticResource BoolToVis}}">
+            <ProgressBar IsIndeterminate="True"/>
+            <TextBlock Text="Reading cleanup locations — nothing is deleted during detection."
+                       Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+        </StackPanel>
+
+        <!-- Groups -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,0">
+            <ItemsControl ItemsSource="{Binding Groups}" ItemTemplate="{StaticResource CleanupGroupTemplate}">
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <ItemsPresenter/>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Bottom action bar -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="16,11" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding SelectedTotalText}" Style="{StaticResource AppText}" FontWeight="SemiBold"/>
+                        <TextBlock Text=" selected across" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding SelectedCount}" Style="{StaticResource SubText}" FontWeight="SemiBold"
+                                   Margin="4,0,0,0" VerticalAlignment="Center"/>
+                        <TextBlock Text=" categorie(s)" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding ProgressText}" Style="{StaticResource SubText}" Margin="0,3,0,0"
+                               Foreground="{DynamicResource TextPrimary}" TextTrimming="CharacterEllipsis" MaxWidth="620"
+                               Visibility="{Binding IsCleaning, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="{Binding CurrentItem}" Style="{StaticResource MutedText}" Margin="0,2,0,0"
+                               TextTrimming="CharacterEllipsis" MaxWidth="620"
+                               Visibility="{Binding CurrentItem, Converter={StaticResource NullToVis}}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="Cancel" Style="{StaticResource BtnDanger}" MinWidth="90" Margin="0,0,10,0"
+                            Command="{Binding CancelCleanCommand}"
+                            Visibility="{Binding IsCleaning, Converter={StaticResource BoolToVis}}"/>
+                    <Button Style="{StaticResource BtnPrimary}" MinWidth="150" Command="{Binding CleanSelectedCommand}"
+                            IsEnabled="{Binding CanClean}">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconCleanup}" Style="{StaticResource IconPath}" Width="14" Height="14"/>
+                            <TextBlock Text="Clean selected" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

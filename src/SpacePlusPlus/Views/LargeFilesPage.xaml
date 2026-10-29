@@ -1,0 +1,162 @@
+<UserControl x:Class="SpacePlusPlus.Views.LargeFilesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <ContextMenu x:Key="FileMenu">
+            <MenuItem Header="Open" Command="{Binding OpenFileCommand}"
+                      CommandParameter="{Binding DataContext.SelectedFiles[0], RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+            <MenuItem Header="Reveal in Explorer" Command="{Binding RevealFileCommand}"
+                      CommandParameter="{Binding DataContext.SelectedFiles[0], RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+            <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}"
+                      CommandParameter="{Binding DataContext.SelectedFiles[0], RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+            <MenuItem Header="Properties" Command="{Binding PropertiesCommand}"
+                      CommandParameter="{Binding DataContext.SelectedFiles[0], RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+        </ContextMenu>
+    </UserControl.Resources>
+
+    <Grid Margin="28,22,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Large Files" Style="{StaticResource PageTitle}"/>
+                <TextBlock Text="{Binding TotalText}" Style="{StaticResource SubText}" Margin="12,3,0,0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Clear filters" Style="{StaticResource BtnSmall}" Command="{Binding ClearFiltersCommand}"
+                        Margin="0,0,10,0"/>
+                <Button Content="Scan again" Style="{StaticResource BtnSmall}" Command="{Binding ScanNowCommand}" MinWidth="96"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Filters -->
+        <Border Grid.Row="1" Style="{StaticResource Card}" Padding="14,10" Margin="0,16,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" MinWidth="200"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Search file names…" VerticalContentAlignment="Center"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock Text="Type" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <ComboBox ItemsSource="{Binding Extensions}" SelectedItem="{Binding ExtensionFilter}"
+                              MinWidth="96" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Orientation="Horizontal">
+                    <TextBlock Text="Location" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <ComboBox ItemsSource="{Binding Locations}" SelectedItem="{Binding LocationFilter}"
+                              MinWidth="120" VerticalContentAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal">
+                    <TextBlock Text="Minimum" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                    <ComboBox ItemsSource="{Binding MinSizeOptions}" SelectedItem="{Binding MinSizeOption}"
+                              MinWidth="96" VerticalContentAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Table -->
+        <Border Grid.Row="2" Background="{DynamicResource Bg2}" BorderBrush="{DynamicResource ControlBorder}"
+                BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+            <Grid>
+                <DataGrid x:Name="FilesGrid" Style="{StaticResource DataGridStyle}"
+                          ItemsSource="{Binding FilesView}"
+                          ContextMenu="{StaticResource FileMenu}"
+                          SelectionChanged="FilesGrid_SelectionChanged"
+                          SelectionMode="Extended"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="260" MinWidth="140"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding SizeText}" Width="96">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource MonoText}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Modified" Binding="{Binding ModifiedText}" Width="150"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding TypeText}" Width="70"/>
+                        <DataGridTextColumn Header="Category" Binding="{Binding CategoryText}" Width="150"/>
+                        <DataGridTextColumn Header="Location" Binding="{Binding Path}" Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" BasedOn="{StaticResource MutedText}"/>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Border Background="{DynamicResource Bg2}" Visibility="{Binding HasScan, Converter={StaticResource BoolToVisInverted}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="420">
+                        <Path Data="{StaticResource IconLargeFiles}" Style="{StaticResource IconPath}"
+                              Width="30" Height="30" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                        <TextBlock Text="No file list yet" Style="{StaticResource AppText}" FontWeight="SemiBold"/>
+                        <TextBlock Style="{StaticResource SubText}" TextWrapping="Wrap" Margin="0,4,0,0"
+                                   Text="Run a scan — files at or above the configured size threshold are tracked here with full actions."/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Selection bar -->
+        <Border Grid.Row="3" Style="{StaticResource Card}" Padding="14,9" Margin="0,10,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding SelectionText}" Style="{StaticResource SubText}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding VisibleCountText}" Style="{StaticResource MutedText}" Margin="14,0,0,0"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Style="{StaticResource BtnIcon}" Command="{Binding OpenFileCommand}"
+                            CommandParameter="{Binding SelectedFiles[0]}" ToolTip="Open file">
+                        <Path Data="{StaticResource IconExternal}" Style="{StaticResource IconPath}" Width="15" Height="15"/>
+                    </Button>
+                    <Button Style="{StaticResource BtnIcon}" Command="{Binding RevealFileCommand}"
+                            CommandParameter="{Binding SelectedFiles[0]}" ToolTip="Reveal in Explorer">
+                        <Path Data="{StaticResource IconFolder}" Style="{StaticResource IconPath}" Width="15" Height="15"/>
+                    </Button>
+                    <Button Style="{StaticResource BtnIcon}" Command="{Binding CopyPathCommand}"
+                            CommandParameter="{Binding SelectedFiles[0]}" ToolTip="Copy path">
+                        <Path Data="{StaticResource IconCopy}" Style="{StaticResource IconPath}" Width="15" Height="15"/>
+                    </Button>
+                    <Button Style="{StaticResource BtnIcon}" Command="{Binding PropertiesCommand}"
+                            CommandParameter="{Binding SelectedFiles[0]}" ToolTip="Properties">
+                        <Path Data="{StaticResource IconInfo}" Style="{StaticResource IconPath}" Width="15" Height="15"/>
+                    </Button>
+                    <Button Style="{StaticResource BtnSmall}" Command="{Binding MoveSelectedCommand}" Margin="6,0,6,0"
+                            ToolTip="Move the selected files to another folder">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconFolder}" Style="{StaticResource IconPath}" Width="13" Height="13"/>
+                            <TextBlock Text="Move" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource BtnDanger}" Command="{Binding DeleteSelectedCommand}" Padding="12,5">
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconTrash}" Style="{StaticResource IconPath}" Width="13" Height="13"/>
+                            <TextBlock Text="Delete" Margin="6,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

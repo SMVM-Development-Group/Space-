@@ -3,6 +3,7 @@
 # intentionally local.
 /*
 !/.gitignore
+!/src/
 
 # Generated artifacts inside the source tree are not source code.
 /src/**/bin/

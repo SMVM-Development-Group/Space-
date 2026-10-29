@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Space++ dark theme (default) -->
+
+    <SolidColorBrush x:Key="Bg0" Color="#111214"/>
+    <SolidColorBrush x:Key="Bg1" Color="#151619"/>
+    <SolidColorBrush x:Key="Bg2" Color="#1B1C20"/>
+    <SolidColorBrush x:Key="Bg3" Color="#222329"/>
+    <SolidColorBrush x:Key="BgHover" Color="#2B2C32"/>
+    <SolidColorBrush x:Key="BgPressed" Color="#323339"/>
+    <SolidColorBrush x:Key="BgActive" Color="#26272E"/>
+
+    <SolidColorBrush x:Key="Accent" Color="#E53935"/>
+    <SolidColorBrush x:Key="AccentHover" Color="#F05552"/>
+    <SolidColorBrush x:Key="AccentPressed" Color="#C42F2B"/>
+    <SolidColorBrush x:Key="AccentDim" Color="#26E53935"/>
+    <SolidColorBrush x:Key="AccentFaint" Color="#14E53935"/>
+
+    <SolidColorBrush x:Key="TextPrimary" Color="#F5F5F6"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#A0A1A8"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#696A73"/>
+
+    <SolidColorBrush x:Key="Success" Color="#49C98A"/>
+    <SolidColorBrush x:Key="SuccessDim" Color="#2649C98A"/>
+    <SolidColorBrush x:Key="Warning" Color="#F0B84B"/>
+    <SolidColorBrush x:Key="WarningDim" Color="#26F0B84B"/>
+    <SolidColorBrush x:Key="Error" Color="#EF5350"/>
+    <SolidColorBrush x:Key="ErrorDim" Color="#26EF5350"/>
+
+    <SolidColorBrush x:Key="ControlBorder" Color="#303137"/>
+    <SolidColorBrush x:Key="BorderSubtle" Color="#26272C"/>
+
+    <SolidColorBrush x:Key="TooltipBackground" Color="#222329"/>
+    <SolidColorBrush x:Key="PopupBackground" Color="#1B1C20"/>
+    <SolidColorBrush x:Key="InputBackground" Color="#1B1C20"/>
+
+    <!-- Treemap palette -->
+    <SolidColorBrush x:Key="TreemapDirLow" Color="#2A3040"/>
+    <SolidColorBrush x:Key="TreemapDirHigh" Color="#3B4A63"/>
+    <SolidColorBrush x:Key="TreemapFileLow" Color="#292C33"/>
+    <SolidColorBrush x:Key="TreemapFileHigh" Color="#3A3F49"/>
+    <SolidColorBrush x:Key="TreemapAggregate" Color="#23252B"/>
+
+</ResourceDictionary>
